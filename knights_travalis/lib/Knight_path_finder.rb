@@ -40,7 +40,7 @@ class KnightPathFinder
         valid_moves
     end
 
-    def new_move_positions(pos)
+    def new_move_positions(pos) 
         moves = valid_moves(pos)
         moves.reject! { |move| @considered_positions.include?(move) }
         moves.each do |move|
@@ -65,6 +65,23 @@ class KnightPathFinder
         
     end
 
+    def find_path(end_pos)
+        end_node = @root_node.dfs(end_pos)
+        path = self.trace_path_back(end_node)
+            return path.map(&:value).reverse
+    end
+
+    def trace_path_back(end_node)
+        nodes = []
+        current_node = end_node
+
+        until current_node.nil?
+            nodes << current_node
+            current_node = current_node.parent
+        end
+
+        nodes
+    end
 
 
 
@@ -78,3 +95,6 @@ end
 arr = [0, 0]
 knight = KnightPathFinder.new(arr)
 p knight
+
+arr2 = [7,7]
+p knight.find_path(arr2)
