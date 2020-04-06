@@ -1,11 +1,11 @@
 require_relative "piece"
 
 class NullPiece < Piece
-    attr_reader :symbol
-    def initialize(color, board, pos)
-        @color = color
-        @board = board
-        @pos = pos
+    attr_reader :symbol, :color
+    def initialize
+        @color = nil
+        @board = self
+        @symbol = " "
     end
 
 end
