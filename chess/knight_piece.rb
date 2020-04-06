@@ -1,4 +1,4 @@
-class Piece
+class Knight < Piece
     attr_reader :color, :board, :pos
     attr_writer :pos
     def initialize(color, board, pos)
@@ -6,6 +6,4 @@ class Piece
         @board = board
         @pos = pos
     end
-
-
 end
