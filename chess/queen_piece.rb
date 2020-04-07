@@ -1,10 +1,13 @@
+
 class Queen < Piece
-    attr_reader :color, :board, :pos, :symbol
-    attr_writer :pos
-    def initialize(color, board, pos)
-        @color = color
-        @board = board
-        @pos = pos
-        @symbol = :Q
-    end
+  attr_accessor :pos
+  attr_reader :color, :board, :symbol
+
+  def initialize(color, board, pos)
+    @color = color
+    @board = board
+    @pos = pos
+    @symbol = :Q
+  end
+
 end
