@@ -9,4 +9,8 @@ class Bishop < Piece
         @pos = pos
         @symbol = :b
     end
+
+    def move_dirs
+        diagonal_dirs
+    end
 end

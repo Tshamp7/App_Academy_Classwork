@@ -38,7 +38,6 @@ module Slideable
     private
 
   def grow_unblocked_moves_in_dir(dx, dy)
-    debugger
     cur_x = pos[0]
     cur_y = pos[1]
     moves = []
