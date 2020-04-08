@@ -57,4 +57,4 @@ module Slideable
     moves
   end
 
-  end
+end

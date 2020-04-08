@@ -20,7 +20,7 @@ class Queen < Piece
     else
         @symbol = :Q.to_s.red
     end
-end
+  end
 
   def move_dirs
     horizontal_and_vertical_dirs + diagonal_dirs
