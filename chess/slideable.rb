@@ -45,7 +45,7 @@ module Slideable
       cur_x += dx
       cur_y += dy        
       pos = [cur_x, cur_y]
-      break if board.valid_pos?(pos) == false
+      break unless board.valid_pos?(pos)
 
       if board.is_empty?(pos) #empty space is a valid move. 
         moves << pos

@@ -54,12 +54,13 @@ class Pawn < Piece
         pos = [cur_row, cur_col]
         if board.valid_pos?(pos)
           if board.is_empty?(pos)
-            if (col == 1 || col == -1)
+            if (col == 0) && (row == 1 || row == -1)
               moves << pos 
-            elsif (col > 1 || col < -1) && pos == start_pos
+            elsif row > 1 && pos == start_pos
               moves << pos 
-          elsif board.board[pos[0]][pos[1]].color != color && (col == 1 || col == -1)
-            moves << pos
+            end
+          else
+            moves << pos if board[pos].color != color && (col == 1 || col == -1)
           end
         end
         moves

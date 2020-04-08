@@ -16,6 +16,20 @@ class Board
     @board = Array.new(8) { Array.new(8) }
   end
 
+  def [](pos)
+    row = pos[0]
+    col = pos[1]
+
+    board[row][col] 
+  end
+
+  def []=(pos, value)
+    row = pos[0]
+    col = pos[1]
+
+    board[row][col] = value
+  end
+
   def place_rook
     white_rooks = [[0, 0], [0, 7]]
     white_rooks.each do |coord|
@@ -79,13 +93,25 @@ class Board
     end
   end
 
+  class MoveError < StandardError
+    def message
+    puts "That move is not a valid move for this piece, please choose another locations."
+    end
+  end
+
+
   def move_piece(start_pos, end_pos)
     raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self.board[start_pos[0]][start_pos[1]].is_a?(NullPiece)
     raise ArgumentError.new("The ending position #{end_pos} is not valid.") if self.board[end_pos[0]][end_pos[1]].symbol != " "
 
-    board[end_pos[0]][end_pos[1]] = board[start_pos[0]][start_pos[1]] 
-    board[start_pos[0]][start_pos[1]] = NullPiece.new
-    board[end_pos[0]][end_pos[1]].pos = end_pos
+    if self[start_pos].moves.include?(end_pos)
+      self[end_pos] = self[start_pos] 
+      self[start_pos] = NullPiece.new
+      self[end_pos].pos = end_pos
+    else
+      raise MoveError => e
+      e.message
+    end
   end
 
   def is_empty?(pos)
@@ -129,15 +155,17 @@ new_board.populate_board
 
 new_board.render
 
-s_pos = [6,0]
-e_pos = [4,0]
+s_pos = [6, 0]
+e_pos = [5, 0]
+
 
 new_board.move_piece(s_pos, e_pos)
 
+
 new_board.render
 
-print new_board.board[e_pos[0]][e_pos[1]].pos
-print new_board.board[e_pos[0]][e_pos[1]].start_pos
+
+
 
 
 
