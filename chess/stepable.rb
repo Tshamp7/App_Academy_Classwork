@@ -44,7 +44,7 @@ KNIGHT = [
  end
 
  def find_moves_of_piece_type(row, col)
-    
+
    cur_row = pos[0]
    cur_col = pos[1]
    moves = []
@@ -60,7 +60,7 @@ KNIGHT = [
             moves << pos
             break #break here, as king can only move one space at a time. 
         else 
-            moves << pos if board.board[pos[0]][pos[1]].color != color #break after taking an opponents piece. 
+            moves << pos if self[pos].color != color #break after taking an opponents piece. 
             break
         end
     end

@@ -9,6 +9,7 @@ require_relative 'pawn_piece'
 require_relative 'null_piece'
 require_relative 'slideable'
 # contains logic for the chess board.
+require 'colorize'
 class Board
   attr_reader :board
   attr_writer :board
@@ -75,9 +76,11 @@ class Board
     @board.each_with_index do |row, idx|
       row.each_index do |idx2|
         if idx == 1
-          @board[idx][idx2] = Pawn.new(:white, self, [idx, idx2])
+          pos = [idx, idx2]
+          self[pos] = Pawn.new(:white, self, [idx, idx2])
         elsif idx == 6
-          @board[idx][idx2] = Pawn.new(:black, self, [idx, idx2])
+          pos = [idx, idx2]
+          self[pos] = Pawn.new(:black, self, [idx, idx2])
         end
       end
     end
@@ -87,7 +90,8 @@ class Board
     @board.each_with_index do |row, idx|
       row.each_index do |idx2|
         if (2..5).include?(idx)
-          board[idx][idx2] = NullPiece.new
+          pos = [idx, idx2]
+          self[pos] = NullPiece.new
         end
       end
     end
@@ -95,22 +99,28 @@ class Board
 
   class MoveError < StandardError
     def message
-    puts "That move is not a valid move for this piece, please choose another locations."
+      puts "That move is not a valid move for this piece, please choose another locations."
     end
   end
 
 
   def move_piece(start_pos, end_pos)
-    raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self.board[start_pos[0]][start_pos[1]].is_a?(NullPiece)
-    raise ArgumentError.new("The ending position #{end_pos} is not valid.") if self.board[end_pos[0]][end_pos[1]].symbol != " "
+  
+    raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self[start_pos].is_a?(NullPiece)
+    if self[end_pos].symbol != " " && self[end_pos].color == self[start_pos].color
+      raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
+    end
 
     if self[start_pos].moves.include?(end_pos)
       self[end_pos] = self[start_pos] 
       self[start_pos] = NullPiece.new
       self[end_pos].pos = end_pos
     else
-      raise MoveError => e
-      e.message
+      begin
+        raise MoveError
+      rescue MoveError => e
+        e.message
+      end
     end
   end
 
@@ -155,14 +165,8 @@ new_board.populate_board
 
 new_board.render
 
-s_pos = [6, 0]
-e_pos = [5, 0]
 
 
-new_board.move_piece(s_pos, e_pos)
-
-
-new_board.render
 
 
 
