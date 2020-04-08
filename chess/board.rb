@@ -85,6 +85,7 @@ class Board
 
     board[end_pos[0]][end_pos[1]] = board[start_pos[0]][start_pos[1]] 
     board[start_pos[0]][start_pos[1]] = NullPiece.new
+    board[end_pos[0]][end_pos[1]].pos = end_pos
   end
 
   def is_empty?(pos)
@@ -128,17 +129,15 @@ new_board.populate_board
 
 new_board.render
 
-pos = [7, 3]
-
-
-s_pos = [6, 3]
-e_pos = [2, 3]
+s_pos = [6,0]
+e_pos = [4,0]
 
 new_board.move_piece(s_pos, e_pos)
 
 new_board.render
 
-p new_board.board[pos[0]][pos[1]].moves
+print new_board.board[e_pos[0]][e_pos[1]].pos
+print new_board.board[e_pos[0]][e_pos[1]].start_pos
 
 
 
