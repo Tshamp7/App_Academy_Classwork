@@ -104,13 +104,13 @@ class Board
   end
 
 
-  def move_piece(start_pos, end_pos)
-  
+  def move_piece(color, start_pos, end_pos)
+    raise ArgumentError.new("That piece is not the correct color.") if self[start_pos].color != color
     raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self[start_pos].is_a?(NullPiece)
     if self[end_pos].symbol != " " && self[end_pos].color == self[start_pos].color
       raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
     end
-
+    
     if self[start_pos].moves.include?(end_pos)
       self[end_pos] = self[start_pos] 
       self[start_pos] = NullPiece.new
@@ -151,19 +151,45 @@ class Board
     place_null
   end
 
-  def render
-    puts "  #{(0..7).to_a.join('|')}"
-    board.each_index do |i|
-      puts "#{i}|#{board[i].map(&:symbol).join('|')}"
+  def find_king(color)
+    board.each_with_index do |row, idx|
+      row.each_index do |idx2|
+        pos = [idx, idx2]
+        if self[pos].is_a?(King) && self[pos].color == color.to_sym
+          return [idx, idx2]
+        end
+      end
     end
   end
+
+  def in_check?(color)
+    king_pos = self.find_king(color)
+
+    board.each do |row|
+      row.each do |piece|
+        if !piece.is_a?(NullPiece)
+          if piece.moves.include?(king_pos)
+            return true
+          end
+        end
+      end
+    end
+    return false
+  end
+
+  def dup
+    return self.board.clone.map(&:clone)
+  end
+
+
 end
 
 new_board = Board.new
 
 new_board.populate_board
 
-new_board.render
+ new_board.in_check?("white")
+
 
 
 
