@@ -1,7 +1,7 @@
 class Simon
   COLORS = [:red, :blue, :yellow, :green]
 
-  attr_accessor :sequence_length, :game_over, :seq, :user_seq
+  attr_accessor :sequence_length, :game_over, :seq, :user_seq, :high_score
 
   def initialize
     @colors = [:red, :blue, :yellow, :green]
@@ -9,6 +9,7 @@ class Simon
     @seq = []
     @game_over = false
     @sequence_length = 0
+    @high_score = 0
   end
 
   def play
@@ -17,22 +18,43 @@ class Simon
 
   def take_turn
     loop do
-      show_sequence
-      # pick up here tomorrow.
+      @user_seq = []
+       show_sequence
+       
+       while user_seq.size < seq.size
+        input = require_sequence 
+        @user_seq << input
+       end
+
+      if seq != user_seq
+        game_over_message
+        sleep(3)
+        @game_over = true
+        reset_game 
+        take_turn
+      else
+        round_success_message
+      end
+    end
+
+      
 
   end
 
   def show_sequence
     add_random_color
-    (1...seq.length).each do |idx|
+    puts "Get ready! I am going to show you the color sequence you need to remember..."
+    sleep(2)
+    (0...sequence_length).each do |idx|
       puts "#{seq[idx]}"
-      sleep{1}
+      sleep(1)
       system("clear")
+      sleep(1)
     end
   end
 
   def require_sequence
-    puts "Enter your color sequence, one color at a time." if user_seq.length == 0
+    puts "Enter your color sequence, one color at a time."
     output = gets.chomp.to_sym
     output
   end
@@ -40,11 +62,15 @@ class Simon
   def add_random_color
     COLORS.shuffle!
     seq << COLORS[0]
-    @sequence_length = seq.size
+    @sequence_length += 1
   end
 
   def round_success_message
     puts "You won this round!"
+    @high_score = sequence_length
+    puts "Your highest score is #{@high_score}"
+    sleep(2)
+    system("clear")
   end
 
   def game_over_message
@@ -58,6 +84,7 @@ class Simon
     @game_over = false
   end
 end
+
 
 new_game = Simon.new
 
