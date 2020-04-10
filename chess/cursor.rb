@@ -1,4 +1,5 @@
 require "io/console"
+require_relative 'board'
 
 KEYMAP = {
   " " => :space,
@@ -33,15 +34,55 @@ MOVES = {
 class Cursor
 
   attr_reader :cursor_pos, :board
+  attr_accessor :selected
 
   def initialize(cursor_pos, board)
     @cursor_pos = cursor_pos
     @board = board
+    @selected = false
   end
 
   def get_input
     key = KEYMAP[read_char]
     handle_key(key)
+  end
+
+
+  def handle_key(key)
+    case key
+    when :return || :space
+      @cursor_pos
+      if @selected == false
+        @selected = true
+      else
+        @selected = false
+      end
+    when :up
+      update_pos(MOVES[:up])
+      nil
+    when :down
+      update_pos(MOVES[:down])
+      nil
+    when :right
+      update_pos(MOVES[:right])
+      nil
+    when :left
+      update_pos(MOVES[:left])
+      nil
+    when :ctrl_c
+      Process.exit(0)
+    end
+  end
+
+  def update_pos(diff)
+    
+     new_row = cursor_pos[0] + diff[0]
+     new_col = cursor_pos[1] + diff[1]
+     if board.valid_pos?(@cursor_pos)
+     @cursor_pos = [new_row, new_col]
+    else
+      raise ArgumentError.new("That is not a valid board position.")
+    end
   end
 
   private
@@ -75,9 +116,23 @@ class Cursor
     return input
   end
 
-  def handle_key(key)
-  end
 
-  def update_pos(diff)
-  end
 end
+
+pos = [0, 0]
+my_cursor = Cursor.new(pos, Board.new)
+
+
+p my_cursor.cursor_pos
+my_cursor.update_pos(MOVES[:down])
+p my_cursor.cursor_pos
+my_cursor.update_pos(MOVES[:down])
+p my_cursor.cursor_pos
+my_cursor.update_pos(MOVES[:up])
+p my_cursor.cursor_pos
+my_cursor.update_pos(MOVES[:up])
+p my_cursor.cursor_pos
+
+
+
+

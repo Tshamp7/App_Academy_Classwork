@@ -15,6 +15,7 @@ class Board
   attr_writer :board
   def initialize
     @board = Array.new(8) { Array.new(8) }
+    populate_board
   end
 
   def [](pos)
@@ -104,8 +105,8 @@ class Board
   end
 
 
-  def move_piece(color, start_pos, end_pos)
-    raise ArgumentError.new("That piece is not the correct color.") if self[start_pos].color != color
+  def move_piece!(color, start_pos, end_pos)
+    raise ArgumentError.new("That piece is not the correct color.") if self[start_pos].color != color.to_sym
     raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self[start_pos].is_a?(NullPiece)
     if self[end_pos].symbol != " " && self[end_pos].color == self[start_pos].color
       raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
@@ -177,10 +178,6 @@ class Board
     return false
   end
 
-  def dup
-    return self.board.clone.map(&:clone)
-  end
-
 
 end
 
@@ -189,7 +186,6 @@ new_board = Board.new
 new_board.populate_board
 
  new_board.in_check?("white")
-
 
 
 
