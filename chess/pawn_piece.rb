@@ -1,5 +1,6 @@
 require_relative "piece"
 require 'colorize'
+require 'duplicate'
 
 class Pawn < Piece
   attr_reader :color, :board, :pos, :symbol, :start_pos
@@ -13,9 +14,9 @@ class Pawn < Piece
   end
   def color_symbol
     if color == :white
-      @symbol = :p.to_s.white
+      @symbol = :p.to_s.white + " "
     else
-      @symbol = :p.to_s.red
+      @symbol = :p.to_s.black + " "
     end
   end  
  
@@ -57,7 +58,7 @@ class Pawn < Piece
           elsif row > 1 && pos == start_pos
             moves << pos 
           end
-          else
+        else
           if board[pos].color != color && col == 1 || col == -1
             moves << pos 
           end

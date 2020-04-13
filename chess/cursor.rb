@@ -1,6 +1,6 @@
 require "io/console"
 require_relative 'board'
-
+require 'duplicate'
 KEYMAP = {
   " " => :space,
   "h" => :left,
@@ -34,12 +34,13 @@ MOVES = {
 class Cursor
 
   attr_reader :cursor_pos, :board
-  attr_accessor :selected
+  attr_accessor :selected, :current_piece
 
   def initialize(cursor_pos, board)
     @cursor_pos = cursor_pos
     @board = board
     @selected = false
+    @current_piece = nil
   end
 
   def get_input
@@ -51,11 +52,15 @@ class Cursor
   def handle_key(key)
     case key
     when :return || :space
-      @cursor_pos
       if @selected == false
         @selected = true
+        @current_piece = board[cursor_pos]
       else
         @selected = false
+      end
+
+      if @selected == false && board.is_empty?(@cursor_pos)
+        @board.move_piece(@current_piece.color, @current_piece.pos, cursor_pos)
       end
     when :up
       update_pos(MOVES[:up])
@@ -75,7 +80,6 @@ class Cursor
   end
 
   def update_pos(diff)
-    
      new_row = cursor_pos[0] + diff[0]
      new_col = cursor_pos[1] + diff[1]
      if board.valid_pos?(@cursor_pos)
@@ -119,19 +123,7 @@ class Cursor
 
 end
 
-pos = [0, 0]
-my_cursor = Cursor.new(pos, Board.new)
 
-
-p my_cursor.cursor_pos
-my_cursor.update_pos(MOVES[:down])
-p my_cursor.cursor_pos
-my_cursor.update_pos(MOVES[:down])
-p my_cursor.cursor_pos
-my_cursor.update_pos(MOVES[:up])
-p my_cursor.cursor_pos
-my_cursor.update_pos(MOVES[:up])
-p my_cursor.cursor_pos
 
 
 

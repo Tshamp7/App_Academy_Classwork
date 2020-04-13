@@ -10,6 +10,7 @@ require_relative 'null_piece'
 require_relative 'slideable'
 # contains logic for the chess board.
 require 'colorize'
+require 'duplicate'
 class Board
   attr_reader :board
   attr_writer :board
@@ -105,10 +106,10 @@ class Board
   end
 
 
-  def move_piece!(color, start_pos, end_pos)
+  def move_piece(color, start_pos, end_pos)
     raise ArgumentError.new("That piece is not the correct color.") if self[start_pos].color != color.to_sym
     raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self[start_pos].is_a?(NullPiece)
-    if self[end_pos].symbol != " " && self[end_pos].color == self[start_pos].color
+    if self[end_pos].symbol != "  " && self[end_pos].color == self[start_pos].color
       raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
     end
     
@@ -126,7 +127,7 @@ class Board
   end
 
   def is_empty?(pos)
-    return true if board[pos[0]][pos[1]].symbol == ' '
+    return true if board[pos[0]][pos[1]].symbol == '  '
     false
   end
 
@@ -178,6 +179,25 @@ class Board
     return false
   end
 
+  def dup
+    output = []
+    @board.each do |row|
+      output << row.clone.map(&:clone)
+    end
+    output
+  end 
+
+  def valid_moves(piece)
+    new_board = Duplicate.duplicate(board)
+    all_moves = piece.moves
+    non_check_moves = all_moves.reject do |move|
+      new_board.place_piece(move, piece)
+      new_board.in_check?(piece.color)
+    end
+    non_check_moves
+  end
+
+
 
 end
 
@@ -185,14 +205,17 @@ new_board = Board.new
 
 new_board.populate_board
 
- new_board.in_check?("white")
+dup = new_board.dup
+
+pos = [0, 0]
+
+test_pos = [1, 0]
+
+# p new_board[pos]
+# p "------------------------------------------"
+# p dup[0][0]
 
 
 
-
-
-
-
-
-
+p dup.valid_moves(dup[0][1])
 

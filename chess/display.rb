@@ -11,6 +11,7 @@ require_relative 'slideable'
 require_relative 'cursor'
 require_relative 'board'
 require 'colorize'
+require 'duplicate'
 
 class Display
     attr_reader :board, :cursor
@@ -35,13 +36,13 @@ class Display
 
   def colors_for(i, j)
     if cursor.cursor_pos == [i, j] && cursor.selected
-        bg = :light_green
+        bg = :light_yellow
     elsif cursor.cursor_pos == [i, j]
       bg = :light_red
     elsif (i + j).odd?
       bg = :light_blue
     else
-      bg = :light_yellow
+      bg = :light_green
     end
     { background: bg }
   end
@@ -49,24 +50,23 @@ class Display
   def render
     system('clear')
     puts 'Arrow keys, WASD, or vim to move, space or enter to confirm.'
-    build_grid.each { |row| puts row.join(" ") }
+    build_grid.each { |row| puts row.join }
   end
 
-#   def test_cursor
-#     loop do
-#     render
-#     self.cursor.get_input
-#     end
-#   end
+  def test_cursor
+    loop do
+    render
+    self.cursor.get_input
+    end
+  end
 
 
 end
 
-game = Display.new(Board.new)
+# game = Display.new(Board.new)
 
 
-
-game.test_cursor
+# game.test_cursor
 
 
 
