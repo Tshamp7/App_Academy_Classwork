@@ -9,6 +9,7 @@ require_relative 'pawn_piece'
 require_relative 'null_piece'
 require_relative 'slideable'
 # contains logic for the chess board.
+require 'byebug'
 require 'colorize'
 require 'duplicate'
 class Board
@@ -113,7 +114,7 @@ class Board
       raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
     end
     
-    if self[start_pos].moves.include?(end_pos)
+    if self.valid_moves(self[start_pos]).include?(end_pos)
       self[end_pos] = self[start_pos] 
       self[start_pos] = NullPiece.new
       self[end_pos].pos = end_pos
@@ -137,6 +138,14 @@ class Board
     end
     false
   end
+
+  def move_piece!(start_pos, end_pos) # allows pieces to be moved without checking conditions so that moves can be evaluated for if they cause the moving player to be placed into check. 
+    self[end_pos] = self[start_pos] 
+    self[start_pos].prev_pos = start_pos
+    self[start_pos] = NullPiece.new
+    self[end_pos].pos = end_pos
+  end
+
 
   def place_piece(arr, piece)
     row = arr[0]
@@ -179,22 +188,14 @@ class Board
     return false
   end
 
-  def dup
-    output = []
-    @board.each do |row|
-      output << row.clone.map(&:clone)
-    end
-    output
-  end 
-
   def valid_moves(piece)
-    new_board = Duplicate.duplicate(board)
-    all_moves = piece.moves
-    non_check_moves = all_moves.reject do |move|
-      new_board.place_piece(move, piece)
-      new_board.in_check?(piece.color)
-    end
-    non_check_moves
+     all_moves = piece.moves
+      (0...all_moves.length).each do |i|
+        self.move_piece!(piece.pos, all_moves[i])
+        all_moves.delete_at(i) if self.in_check?(piece.color)
+        self.move_piece!(piece.pos, piece.prev_pos)
+      end
+    all_moves
   end
 
 
@@ -205,17 +206,10 @@ new_board = Board.new
 
 new_board.populate_board
 
-dup = new_board.dup
-
-pos = [0, 0]
-
-test_pos = [1, 0]
-
-# p new_board[pos]
-# p "------------------------------------------"
-# p dup[0][0]
 
 
 
-p dup.valid_moves(dup[0][1])
+
+
+
 

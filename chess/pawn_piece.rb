@@ -3,20 +3,21 @@ require 'colorize'
 require 'duplicate'
 
 class Pawn < Piece
-  attr_reader :color, :board, :pos, :symbol, :start_pos
-  attr_writer :pos
+  attr_reader :color, :board, :pos, :symbol, :start_pos, :prev_pos
+  attr_writer :pos, :prev_pos
   def initialize(color, board, pos)
     @color = color
     @board = board
     @pos = pos
     @start_pos = pos
     @symbol = color_symbol
+    @prev_pos = nil
   end
   def color_symbol
     if color == :white
-      @symbol = :p.to_s.white + " "
+      @symbol = :p.to_s.white + ' '
     else
-      @symbol = :p.to_s.black + " "
+      @symbol = :p.to_s.black + ' '
     end
   end  
  

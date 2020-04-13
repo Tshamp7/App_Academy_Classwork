@@ -63,10 +63,10 @@ class Display
 
 end
 
-# game = Display.new(Board.new)
+game = Display.new(Board.new)
 
 
-# game.test_cursor
+game.test_cursor
 
 
 
