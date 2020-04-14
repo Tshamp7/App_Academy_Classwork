@@ -60,7 +60,7 @@ KNIGHT = [
             moves << pos
             break #break here, as king can only move one space at a time. 
         else 
-            moves << pos if self.color != color #break after taking an opponents piece. 
+            moves << pos if color != board[pos].color #break after taking an opponents piece. 
             break
         end
     end

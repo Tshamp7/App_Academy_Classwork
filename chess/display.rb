@@ -53,20 +53,9 @@ class Display
     build_grid.each { |row| puts row.join }
   end
 
-  def test_cursor
-    loop do
-    render
-    self.cursor.get_input
-    end
-  end
-
-
 end
 
-game = Display.new(Board.new)
 
-
-game.test_cursor
 
 
 

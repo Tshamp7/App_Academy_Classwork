@@ -4,8 +4,8 @@ require 'colorize'
 
 class Queen < Piece
     include Slideable
-  attr_accessor :pos, :prev_pos
-  attr_reader :color, :board, :symbol
+  attr_accessor :pos, :prev_pos, :last_capture
+  attr_reader :color, :board, :symbol, :last_capture
 
   def initialize(color, board, pos)
     @color = color
@@ -13,6 +13,7 @@ class Queen < Piece
     @pos = pos
     @symbol = color_symbol
     @prev_pos = nil
+    @last_capture = nil
   end
 
   def color_symbol

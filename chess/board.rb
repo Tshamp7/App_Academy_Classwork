@@ -8,10 +8,11 @@ require_relative 'king_piece'
 require_relative 'pawn_piece'
 require_relative 'null_piece'
 require_relative 'slideable'
-# contains logic for the chess board.
 require 'byebug'
 require 'colorize'
 require 'duplicate'
+
+# contains logic for the chess board.
 class Board
   attr_reader :board
   attr_writer :board
@@ -103,28 +104,83 @@ class Board
   class MoveError < StandardError
     def message
       puts "That move is not a valid move for this piece, please choose another locations."
+      sleep(2)
+    end
+  end
+
+  class ColorError < StandardError
+    def message
+      puts "That piece is not the correct color."
+      sleep(2)
+    end
+  end
+
+  class NoPieceError < StandardError
+    def message
+      puts "There is no piece to move at that locations. Please try another."
+      sleep(2)
+    end
+  end
+
+  class InvalidEndError < StandardError
+    def message
+      puts "That ending position is not valid. Please try another"
+      sleep(2)
+    end
+  end
+
+  class KingCheckError < StandardError
+    def message
+      puts "That move will place your king in check. Please try another."
+      sleep(2)
     end
   end
 
 
   def move_piece(color, start_pos, end_pos)
-    raise ArgumentError.new("That piece is not the correct color.") if self[start_pos].color != color.to_sym
-    raise ArgumentError.new("There is no piece to move at #{start_pos}.") if self[start_pos].is_a?(NullPiece)
-    if self[end_pos].symbol != "  " && self[end_pos].color == self[start_pos].color
-      raise ArgumentError.new("The ending position #{end_pos} is not valid.") 
+    if self[start_pos].color != color.to_sym
+      begin
+      raise ColorError
+      rescue ColorError => e
+        e.message
+      end
+    elsif self[start_pos].is_a?(NullPiece)
+      begin
+        raise NoPieceError
+        rescue NoPieceError => e
+          e.message
+        end
+    elsif self[end_pos].symbol != '  ' && self[end_pos].color == self[start_pos].color
+      begin
+        raise InvalidEndError
+        rescue InvalidEndError => e
+          e.message
+        end
     end
-    
-    if self.valid_moves(self[start_pos]).include?(end_pos)
-      self[end_pos] = self[start_pos] 
-      self[start_pos] = NullPiece.new
-      self[end_pos].pos = end_pos
+
+    if self[start_pos].moves.include?(end_pos)
+      if !self.in_check_move(self[start_pos]).include?(end_pos)
+        self[end_pos] = self[start_pos] 
+        self[start_pos].prev_pos = start_pos
+        self[start_pos] = NullPiece.new
+        self[end_pos].pos = end_pos
+      else
+        begin
+          raise KingCheckError
+        rescue KingCheckError => e
+          e.message
+          return
+        end
+      end
     else
       begin
         raise MoveError
       rescue MoveError => e
         e.message
+        return
       end
     end
+    true
   end
 
   def is_empty?(pos)
@@ -171,6 +227,7 @@ class Board
         end
       end
     end
+    false
   end
 
   def in_check?(color)
@@ -179,8 +236,10 @@ class Board
     board.each do |row|
       row.each do |piece|
         if !piece.is_a?(NullPiece)
-          if piece.moves.include?(king_pos)
-            return true
+          if piece.color != color
+            if piece.moves.include?(king_pos)
+              return true
+            end
           end
         end
       end
@@ -188,15 +247,19 @@ class Board
     return false
   end
 
-  def valid_moves(piece)
+  def in_check_move(piece)
+    check_moves = []
      all_moves = piece.moves
       (0...all_moves.length).each do |i|
-        self.move_piece!(piece.pos, all_moves[i])
-        all_moves.delete_at(i) if self.in_check?(piece.color)
-        self.move_piece!(piece.pos, piece.prev_pos)
+        last_capture = self[all_moves[i]]
+        move_piece!(piece.pos, all_moves[i])
+        check_moves << all_moves[i] if self.in_check?(piece.color)
+        move_piece!(piece.pos, piece.prev_pos)
+        self[all_moves[i]] = last_capture
       end
-    all_moves
+    check_moves
   end
+
 
 
 
@@ -205,6 +268,7 @@ end
 new_board = Board.new
 
 new_board.populate_board
+
 
 
 

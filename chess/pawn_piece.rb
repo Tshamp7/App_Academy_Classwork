@@ -3,8 +3,8 @@ require 'colorize'
 require 'duplicate'
 
 class Pawn < Piece
-  attr_reader :color, :board, :pos, :symbol, :start_pos, :prev_pos
-  attr_writer :pos, :prev_pos
+  attr_reader :color, :board, :pos, :symbol, :start_pos, :prev_pos, :last_capture
+  attr_writer :pos, :prev_pos, :last_capture
   def initialize(color, board, pos)
     @color = color
     @board = board
@@ -12,6 +12,7 @@ class Pawn < Piece
     @start_pos = pos
     @symbol = color_symbol
     @prev_pos = nil
+    @last_capture = nil
   end
   def color_symbol
     if color == :white
@@ -51,17 +52,15 @@ class Pawn < Piece
       moves = []
       cur_row += row
       cur_col += col  
-      pos = [cur_row, cur_col]
-      if board.valid_pos?(pos)
-        if board.is_empty?(pos)
-          if (col.zero?) && [1, -1].include?(row)
-            moves << pos 
-          elsif row > 1 && pos == start_pos
-            moves << pos 
+      position = [cur_row, cur_col]
+      if board.valid_pos?(position)
+        if board.is_empty?(position)
+          if [1, -1].include?(row) && col.zero? || [2, -2].include?(row) && pos == start_pos
+            moves << position
           end
         else
-          if board[pos].color != color && col == 1 || col == -1
-            moves << pos 
+          if board[position].color != color && col == 1 || col == -1
+            moves << position
           end
         end
       end

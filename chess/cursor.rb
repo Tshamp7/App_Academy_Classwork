@@ -33,8 +33,8 @@ MOVES = {
 
 class Cursor
 
-  attr_reader :cursor_pos, :board
-  attr_accessor :selected, :current_piece
+  attr_reader :board
+  attr_accessor :selected, :current_piece, :cursor_pos
 
   def initialize(cursor_pos, board)
     @cursor_pos = cursor_pos
@@ -59,7 +59,7 @@ class Cursor
         @selected = false
       end
 
-      if @selected == false && board.is_empty?(@cursor_pos)
+      if @selected == false #&& board.is_empty?(@cursor_pos)
         @board.move_piece(@current_piece.color, @current_piece.pos, cursor_pos)
       end
     when :up
@@ -79,13 +79,27 @@ class Cursor
     end
   end
 
+  class InvalidCursorPos < StandardError
+    def message
+      puts "That is not a valid board position. Please keep the cursor on the chess board."
+      sleep(2)
+    end
+  end
+
+
+
   def update_pos(diff)
      new_row = cursor_pos[0] + diff[0]
      new_col = cursor_pos[1] + diff[1]
-     if board.valid_pos?(@cursor_pos)
-     @cursor_pos = [new_row, new_col]
+    if board.valid_pos?(@cursor_pos)
+      @cursor_pos = [new_row, new_col]
     else
-      raise ArgumentError.new("That is not a valid board position.")
+      begin
+        raise InvalidCursorPos
+      rescue InvalidCursorPos => e
+        e.message
+        self.cursor_pos = [0, 0]
+      end
     end
   end
 

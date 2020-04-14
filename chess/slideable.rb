@@ -50,7 +50,7 @@ module Slideable
       if board.is_empty?(pos) #empty space is a valid move. 
         moves << pos
       else
-        moves << pos if self.color != color #can replace, or "take" opponents piece if the color is not the same as color of self. 
+        moves << pos if color != board[pos].color #can replace, or "take" opponents piece if the color is not the same as color of self. 
         break
       end
     end
