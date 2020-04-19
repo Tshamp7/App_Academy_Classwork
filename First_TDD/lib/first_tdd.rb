@@ -50,9 +50,10 @@ require 'rspec'
   end
 
 class Towers_of_Hanoi
-  attr_accessor :arrays
+  attr_accessor :arrays, :game_over
   def initialize
     @arrays = [[3, 2, 1], [], []]
+    @game_over = false
   end
 
   def move (start_pos, end_pos)
@@ -60,17 +61,28 @@ class Towers_of_Hanoi
       raise 'cannot move from an empty stack'
     end
 
-    if !arrays[end_pos].empty? 
-      if arrays[end_pos].last < arrays[start_pos].pop
+    if !arrays[end_pos].empty? && !arrays[start_pos].empty?
+      if arrays[end_pos].last < arrays[start_pos].last
         raise 'cannot move onto a smaller disk'
       end
     end
 
-    arrays[end_pos] << arrays[start_pos].pop
-    
-  end
- 
 
+    arrays[end_pos] << arrays[start_pos].pop
+  end
+
+  def won?
+    if arrays[0].empty? && (arrays[1].empty? || arrays[2].empty?)
+      puts "Congratulations! You won the game!"
+      @game_over = true
+      return true
+    end
+    @game_over = false
+  end
+
+  def render
+    p "Tower1: #{arrays[0]} Tower2: #{arrays[1]} Tower3: #{arrays[2]}"
+  end
 
 end
 

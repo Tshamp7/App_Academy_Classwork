@@ -62,13 +62,18 @@ end
 
 describe 'Towers_of_Hanoi' do
   let(:towers) { Towers_of_Hanoi.new }
-  let(:sorted) { [1, 2, 3] }
 
     describe '#initialize' do
       it 'should initialize three arrays' do
         expect(towers.arrays.size).to eq(3)
       end
     end
+
+  describe '#render' do
+    it 'should print the contents of the towers' do
+      expect(towers.render).to eq("Tower1: [3, 2, 1] Tower2: [] Tower3: []")
+    end
+  end
   
     describe '#move' do
       it 'should allow the user to move to a blank space' do
@@ -124,6 +129,7 @@ describe 'Towers_of_Hanoi' do
       expect(towers).to be_won
     end
   end
+
 
 end
 
