@@ -61,7 +61,7 @@ class Towers_of_Hanoi
       raise 'cannot move from an empty stack'
     end
 
-    if !arrays[end_pos].empty? && !arrays[start_pos].empty?
+    if !arrays[end_pos].empty? 
       if arrays[end_pos].last < arrays[start_pos].last
         raise 'cannot move onto a smaller disk'
       end
@@ -71,9 +71,29 @@ class Towers_of_Hanoi
     arrays[end_pos] << arrays[start_pos].pop
   end
 
+  def get_input
+    puts 'Please enter the tower position you would like to move from as a single number.'
+      start_pos = gets.chomp.to_i
+    puts 'Please enter the tower position you would like to move to as a single number.'
+      end_pos = gets.chomp.to_i
+      move(start_pos, end_pos)
+  end
+
+  def play_game
+    until game_over
+      render
+      get_input
+      won?
+      system("clear")
+    end
+  end
+
   def won?
     if arrays[0].empty? && (arrays[1].empty? || arrays[2].empty?)
+      system("clear")
+      render
       puts "Congratulations! You won the game!"
+      sleep(2)
       @game_over = true
       return true
     end
@@ -85,5 +105,7 @@ class Towers_of_Hanoi
   end
 
 end
+
+
 
 
