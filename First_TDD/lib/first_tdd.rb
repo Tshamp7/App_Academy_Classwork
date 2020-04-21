@@ -73,14 +73,15 @@ class Towers_of_Hanoi
 
   def get_input
     puts 'Please enter the tower position you would like to move from as a single number.'
-      start_pos = gets.chomp.to_i
+      start_pos = (gets.chomp.to_i) - 1 # Tower # to index position
     puts 'Please enter the tower position you would like to move to as a single number.'
-      end_pos = gets.chomp.to_i
+      end_pos = (gets.chomp.to_i) - 1# Tower # to index position
       move(start_pos, end_pos)
   end
 
   def play_game
     until game_over
+      system("clear")
       render
       get_input
       won?
@@ -101,11 +102,13 @@ class Towers_of_Hanoi
   end
 
   def render
-    p "Tower1: #{arrays[0]} Tower2: #{arrays[1]} Tower3: #{arrays[2]}"
+    puts "Tower1: #{arrays[0]} Tower2: #{arrays[1]} Tower3: #{arrays[2]}"
   end
 
 end
 
+my_game = Towers_of_Hanoi.new
 
+my_game.play_game
 
 
