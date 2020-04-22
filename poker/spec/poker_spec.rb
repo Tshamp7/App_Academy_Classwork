@@ -95,7 +95,7 @@ describe 'Hand' do
       expect(hand.find_values).to be_an(Array)
     end
 
-    it 'should return an array of all cards face_values in that hand' do
+    it 'should return an array of all cards values in that hand' do
       hand.cards = [card1, card2, card3, card6, card7]
       expect(hand.find_values).to eq(%w[3 3 3 9 5])
     end
@@ -107,7 +107,7 @@ describe 'Hand' do
       expect(hand.find_suits).to be_an(Array)
     end
 
-    it 'should return an array of all cards face_values in that hand' do
+    it 'should return an array of all cards suits in that hand' do
       hand.cards = [card1, card2, card3, card6, card7]
       expect(hand.find_suits).to eq(%w[clubs spades hearts hearts spades])
     end
@@ -146,8 +146,8 @@ describe 'Player' do
       expect(player.hand).to be_a(Hand)
     end
 
-    it 'should set the players pot to zero' do
-      expect(player.pot).to eq(0)
+    it 'should set the players pot to 500' do
+      expect(player.pot).to eq(500)
     end
   end
 
@@ -162,4 +162,45 @@ describe 'Player' do
       expect(player.hand).to eq([nil, 1, 2, 3, 4])
     end
   end
+
+end
+
+describe 'Game' do
+  let(:game) { Game.new("Tom", "Amber", "Kai", "Joe")}
+
+  describe '#initialize' do
+    it 'should create an array to hold players names.' do
+      expect(game.players).to be_an(Array)
+    end
+
+    it 'The players array should be populated with player instances.' do
+      expect(game.players[0]).to be_a(Player)
+    end
+  end
+
+  describe '#change_turn' do
+    it 'should change the current player turn to the next player in the players array.' do
+      curr_player = game.turn.name
+      game.change_turn
+      new_curr_player = game.turn.name
+      expect(curr_player).not_to eq(new_curr_player)
+    end
+  end
+
+  describe '#display_pot' do
+    it 'should display the amount in the pot.' do
+      expect(game.display_pot).to eq(0)
+    end
+  end
+
+  describe '#deal' do
+    it 'should deal 5 cards into the players hand.' do
+      game.deck.build_deck
+      game.deck.shuffle
+      game.deal
+      current_players_cards = game.turn.hand.cards
+      expect(current_players_cards.length).to eq(5)
+    end
+  end
+
 end

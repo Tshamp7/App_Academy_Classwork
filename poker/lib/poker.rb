@@ -22,9 +22,13 @@ class Deck
     suits.each_with_index do |suit, idx|
       values.each_with_index do |value, idx2|
         card = Card.new(suit, value)
-        deck << card
+        @deck << card
       end
     end
+  end
+
+  def shuffle
+    @deck.shuffle!
   end
 end
 
@@ -72,6 +76,8 @@ class Hand
 
     self.type = 'pair' if values.uniq.length == 4
 
+    return nil
+
   end
 
   def find_values
@@ -114,7 +120,7 @@ class Player
   def initialize(name)
     @name = name
     @hand = Hand.new
-    @pot = 0
+    @pot = 500
   end
 
   class InvalidCardError < StandardError
@@ -136,7 +142,10 @@ class Player
     discarded = 0
 
     while discard
-      break if discarded == 3
+      if discarded == 3
+        puts 'Maximum discard limit reached.'
+        break
+      end
 
       puts "would you like to discard a card? Please enter 'yes' or 'no'."
       yes_or_no = gets.chomp
@@ -154,5 +163,49 @@ class Player
     end
   end
 
-    
+  def fold_see_raise
+    puts "Would you like to fold, see, or raise? Enter 'fold', 'see', 'raise', or 'no'."
+    input = gets.chomp
+    input
+  end
+end
+
+class Game
+  attr_reader :players, :deck, :turn, :pot
+  attr_writer :players, :turn, :pot
+  def initialize(*player_names)
+    @players = player_names.map { |player_name| Player.new(player_name) }
+    @deck = Deck.new
+    @turn = players[0]
+    @pot = 0
+    @game_over = false
+  end
+
+  def change_turn
+    @players.rotate!
+    @turn = players[0]
+  end
+
+  def display_pot
+    pot
+  end
+
+  def raise(amount)
+    @pot += amount
+    turn.pot -= amount
+  end
+
+  def deal
+    until players.all? { |player| player.hand.cards.length == 5 }
+      @players.each do |player|
+        deck_cards = deck.deck
+        players_hand = player.hand.cards
+        players_hand << deck_cards.pop if players_hand.length < 5
+      end
+    end
+  end
+
+
+
+
 end
