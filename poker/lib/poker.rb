@@ -45,15 +45,12 @@ class Hand
                 %w[10 8 9 J Q], 
                 %w[10 9 J K Q]]
     @winning_hand = false
-    @hand_rankings = ['Royal Flush', 
-                      'Flush', 
-                      'four-of-a-kind', 
-                      'three-of-a-kind', 
+    @hand_rankings = ['Royal Flush',
+                      'Flush',
+                      'four-of-a-kind',
+                      'three-of-a-kind',
                       'pair'].freeze
   end
-
-
-
 
   def calculate_hand
     # debugger
@@ -93,6 +90,14 @@ class Hand
     output
   end
 
+  def cards_info
+    output = []
+    cards.each do |card|
+      output << card.face_value
+    end
+    output
+  end
+
   def winning_hand?(other_hand)
     other_hand.calculate_hand
     calculate_hand
@@ -103,3 +108,51 @@ class Hand
   end
 end
 
+class Player
+  attr_accessor :hand, :pot
+  attr_reader :name
+  def initialize(name)
+    @name = name
+    @hand = Hand.new
+    @pot = 0
+  end
+
+  class InvalidCardError < StandardError
+    def message 
+      'Your entry contains invalid index positions. Please use valid index positions.'
+    end
+  end
+
+  def discard(card1 = nil)
+    if (0..5).include?(card1) && !card1.nil?
+      hand[card1] = nil
+    else
+        raise InvalidCardError
+    end
+  end
+
+  def input_for_discard
+    discard = true
+    discarded = 0
+
+    while discard
+      break if discarded == 3
+
+      puts "would you like to discard a card? Please enter 'yes' or 'no'."
+      yes_or_no = gets.chomp
+      break unless yes_or_no == 'yes' 
+
+      discarded += 1
+  
+      hand.cards_info.each_with_index do |card, i|
+        puts "index: #{i} card: #{card}"
+      end
+  
+      puts 'Please enter the index position of the card you would like to discard.'
+      card = gets.chomp.to_i
+      discard(card)
+    end
+  end
+
+    
+end

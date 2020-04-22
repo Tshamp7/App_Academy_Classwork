@@ -112,6 +112,17 @@ describe 'Hand' do
       expect(hand.find_suits).to eq(%w[clubs spades hearts hearts spades])
     end
   end
+  
+  describe '#cards_info' do
+    it 'should return an array of the face values and suits of each card in the hand.' do
+      hand.cards = [card1, card2, card3, card6, card7]
+      expect(hand.cards_info).to eq(['3 of clubs',
+                                     '3 of spades',
+                                     '3 of hearts',
+                                     '9 of hearts',
+                                     '5 of spades'])
+    end
+  end
 
   describe '#winning_hand?' do
     it 'should return true if it beats a hand it is compared against.' do
@@ -122,8 +133,33 @@ describe 'Hand' do
       expect(hand.winning_hand?(hand2)).to eq(true)
     end
   end
+end
 
+describe 'Player' do
+  let(:player) { Player.new("Tom") }
+  describe '#initialize' do
+    it 'sets the players name equal to the name provided to the function.' do
+      expect(player.name).to eq("Tom")
+    end
 
+    it 'should initialize an instance of Hand for the players hand.' do
+      expect(player.hand).to be_a(Hand)
+    end
 
+    it 'should set the players pot to zero' do
+      expect(player.pot).to eq(0)
+    end
+  end
 
+  describe '#discard' do
+    it 'raises an error when the player does not provide a valid index position.' do
+      expect { player.discard(-1) }.to raise_error('Your entry contains invalid index positions. Please use valid index positions.')
+    end
+
+    it 'removes the cards stored at the passed in index positions from the players hand.' do
+      player.hand = [0, 1, 2, 3, 4]
+      player.discard(0)
+      expect(player.hand).to eq([nil, 1, 2, 3, 4])
+    end
+  end
 end
