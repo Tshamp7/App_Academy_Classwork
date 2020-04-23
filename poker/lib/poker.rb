@@ -10,8 +10,7 @@ class Card
 end
 
 class Deck
-  attr_reader :deck, :suits, :values
-  attr_writer :deck
+  attr_accessor :deck, :suits, :values
   def initialize
     @deck = []
     @suits =  %w[hearts clubs diamonds spades]
@@ -28,36 +27,48 @@ class Deck
   end
 
   def shuffle
-    @deck.shuffle!
+   5.times { @deck.shuffle! }
   end
 end
 
 class Hand
-  attr_accessor :cards, :type, :winning_hand
-  attr_reader :flushes, :hand_rankings
+  attr_accessor :cards, :type, :winning_hand, :highest_card
+  attr_reader :flushes, :hand_rankings, :card_nums
   def initialize
     @cards = []
     @type = nil
-    @flushes = [%w[1 2 3 4 A], 
-                %w[1 2 3 4 5], 
+    @flushes = [%w[2 3 4 5 A],  
                 %w[2 3 4 5 6], 
                 %w[3 4 5 6 7], 
                 %w[4 5 6 7 8], 
                 %w[5 6 7 8 9], 
                 %w[10 6 7 8 9], 
                 %w[10 7 8 9 J], 
-                %w[10 8 9 J Q], 
+                %w[10 8 9 J Q],
                 %w[10 9 J K Q]]
     @winning_hand = false
     @hand_rankings = ['Royal Flush',
                       'Flush',
                       'four-of-a-kind',
                       'three-of-a-kind',
-                      'pair'].freeze
+                      'pair', nil].freeze
+    @card_nums = {'A'=>1, 
+                  '2'=>2, 
+                  '3'=>3, 
+                  '4'=>4, 
+                  '5'=>5, 
+                  '6'=>6, 
+                  '7'=>7, 
+                  '8'=>8, 
+                  '9'=>9, 
+                  '10'=>10, 
+                  'J'=>11, 
+                  'Q'=>12, 
+                  'K'=>13}
+    @highest_card = 0
   end
 
   def calculate_hand
-    # debugger
     values = find_values
     suits = find_suits
 
@@ -70,13 +81,17 @@ class Hand
       self.type = 'flush'
     end
 
-    self.type = 'four-of-a-kind' if values.uniq.length == 2
+    if values.uniq.length == 2
+      self.type = 'four-of-a-kind' 
 
-    self.type = 'three-of-a-kind' if values.uniq.length == 3
+    elsif values.uniq.length == 3
+      self.type = 'three-of-a-kind' 
 
-    self.type = 'pair' if values.uniq.length == 4
-
-    return nil
+    elsif values.uniq.length == 4
+      self.type = 'pair'
+    else
+      self.type = nil
+    end
 
   end
 
@@ -99,9 +114,22 @@ class Hand
   def cards_info
     output = []
     cards.each do |card|
-      output << card.face_value
+      if card == nil
+        output << nil
+      else
+        output << card.face_value
+      end
     end
     output
+  end
+
+  def calculate_highest_card
+    card_numbers = []
+    values = find_values
+    values.each do |value|
+      card_numbers << @card_nums[value]
+    end
+    @highest_card = card_numbers.max
   end
 
   def winning_hand?(other_hand)
@@ -130,8 +158,8 @@ class Player
   end
 
   def discard(card1 = nil)
-    if (0..5).include?(card1) && !card1.nil?
-      hand[card1] = nil
+    if (0..4).include?(card1) && !card1.nil?
+      hand.cards.delete_at(card1)
     else
         raise InvalidCardError
     end
@@ -149,7 +177,7 @@ class Player
 
       puts "would you like to discard a card? Please enter 'yes' or 'no'."
       yes_or_no = gets.chomp
-      break unless yes_or_no == 'yes' 
+      break unless yes_or_no == 'yes'
 
       discarded += 1
   
@@ -164,21 +192,26 @@ class Player
   end
 
   def fold_see_raise
-    puts "Would you like to fold, see, or raise? Enter 'fold', 'see', 'raise', or 'no'."
+    puts "Would you like to fold, call, or raise? Enter 'fold', 'call', or raise'."
     input = gets.chomp
     input
   end
 end
 
 class Game
-  attr_reader :players, :deck, :turn, :pot
-  attr_writer :players, :turn, :pot
+  attr_reader :players, :deck, :turn, :pot, :buy_in_amount, :current_bet, :called, :high_bet_placer, :original_players
+  attr_writer :players, :turn, :pot, :buy_in_amount, :current_bet, :called, :high_bet_placer
   def initialize(*player_names)
     @players = player_names.map { |player_name| Player.new(player_name) }
+    @original_players = player_names.to_a
     @deck = Deck.new
     @turn = players[0]
     @pot = 0
     @game_over = false
+    @buy_in_amount = 50
+    @current_bet = 0
+    @called = false
+    @high_bet_placer = nil
   end
 
   def change_turn
@@ -190,9 +223,50 @@ class Game
     pot
   end
 
-  def raise(amount)
+  def fold
+    @players.delete(@turn)
+    @turn = players[0]
+  end
+
+  def get_fold_see_raise
+    case @turn.fold_see_raise
+    when 'fold'
+      puts "#{turn.name} has folded!"
+      fold
+      return false
+    when 'call'
+      call
+    when 'raise'
+      raise_bet
+    end
+  end
+
+  def bet
+    puts "#{turn.name}, please enter your bet."
+    amount = gets.chomp.to_i
+    puts "#{turn.name} bets #{amount}!"
+    @current_bet = amount
     @pot += amount
-    turn.pot -= amount
+    @turn.pot -= amount
+    @high_bet_placer = @turn
+  end
+
+  def call
+    puts "#{turn.name} has called and matched the bet placed by #{high_bet_placer.name}."
+    turn.pot -= @current_bet
+    @pot += current_bet
+    @called = true if @called == false
+  end
+
+  def raise_bet
+    puts 'How much would you like to raise?'
+    amount = gets.chomp.to_i
+    puts "#{turn.name} raises #{amount}!"
+    @pot += amount
+    @turn.pot -= amount
+    @current_bet += amount
+    @high_bet_placer = @turn
+    @called = true
   end
 
   def deal
@@ -205,7 +279,124 @@ class Game
     end
   end
 
+  def find_best_hand
+    hand_ranks = {}
+    card_nums = {}
+    no_hand_type_nums = {}
+    players.each do |player|
+      players_hand = player.hand
+      players_hand.calculate_hand
+      players_hand.calculate_highest_card
+      if !players_hand.type.nil?
+        hand_ranks[player] = players_hand.hand_rankings.index(players_hand.type)
+        card_nums[player] = players_hand.highest_card
+      end
+      if players_hand.type == nil
+        no_hand_type_nums[player] = players_hand.highest_card
+      end
+       
+    end
+    
+    if hand_ranks.size > 1 && hand_ranks.values.uniq.length == 1
+      return card_nums.key(card_nums.values.max)
+    end
+  
+    if hand_ranks.values.count(hand_ranks.values.min) == 1
+      return hand_ranks.key(hand_ranks.values.min)
+    end
 
+    if hand_ranks.values.count(hand_ranks.values.min) > 1
+      return card_nums.key(card_nums.values.max)
+    end
+
+    return no_hand_type_nums.key(no_hand_type_nums.values.max) if hand_ranks.empty?
+  end
+
+  def assign_winnings
+    if @players.length == 1
+      puts "#{@players[0].name} has won the game! and takes home the pot of #{@pot}!"
+      winning_player = @players[0]
+      winning_player.pot += @pot
+      @pot = 0
+    elsif @called == true
+      winning_player = find_best_hand
+      winning_player.pot += @pot
+      @pot = 0
+    else
+      winning_player = @high_bet_placer
+      winning_player.pot += @pot
+      @pot = 0
+    end
+  end
+
+  def play_game
+    deck.build_deck
+    deck.shuffle
+    deal
+    buy_in
+    take_turn = 0
+    until @game_over
+     
+     puts "#{turn.name} your cards are: #{turn.hand.cards_info}"
+     @turn.input_for_discard
+     deal
+
+     if current_bet.zero?
+       bet
+       change_turn
+     else 
+       if get_fold_see_raise == false
+         if @players.length == 1
+            @game_over = true
+            assign_winnings
+         end
+       else
+         take_turn += 1
+         change_turn
+       end
+       take_turn += 1
+     end
+    end
+
+    if take_turn == players.length
+      if @called == false
+        @game_over = true
+        assign_winnings
+        if @players.all? { |player| player.pot >= 50 }
+          @game_over = false
+          reset_game
+          play_game
+        end
+      else
+        assign_winnings
+      end
+    end
+  end
+
+  def buy_in
+    players.each do |player|
+      player.pot -= 50
+      @pot += 50
+    end
+  end
+
+  def empty_hands
+    @players.each do |player|
+      player.hand = Hand.new
+    end
+  end
+
+  def reset_game
+    empty_hands
+    @players = original_players.map { |player_name| Player.new(player_name) }
+    @called = false
+    @high_bet_placer = false
+    play_game
+  end
 
 
 end
+
+my_game = Game.new('Tom', 'Amber', 'Kai', 'Joe')
+
+my_game.play_game
