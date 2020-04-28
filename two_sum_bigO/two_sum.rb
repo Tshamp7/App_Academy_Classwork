@@ -3,6 +3,8 @@ require 'byebug'
 nums = [0, 1, 5, 7]
 
 #the time complexity of this is O(n^2)
+#O(1) constant space
+
 def bad_two_sum?(arr, target)
   arr.each_with_index do |num, i|
     arr.each_with_index do |num2, j|
@@ -16,7 +18,8 @@ end
 #p bad_two_sum?(nums, 6) > true
 #p bad_two_sum?(nums, 10) > false
 
-
+#O(nlogn) linearithmic time
+#O(n) linear space
 def okay_two_sum?(arr, target)
   sorted = arr.sort
   sorted.each_with_index do |el, i|
@@ -27,6 +30,9 @@ def okay_two_sum?(arr, target)
 end
 
 #p okay_two_sum?(nums, 6)
+
+#O(n) linear time
+#O(n) linear space
 
 def best_two_sum?(arr, target_sum)
     nums_hash = {}
