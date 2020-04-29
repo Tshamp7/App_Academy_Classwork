@@ -1,3 +1,4 @@
+require 'byebug'
 
 #O(n^3) due to use of rubys built-in min and max methods on each iterations. 
 #These are both O(n). The third O(n) comes from slicing the array into a new array at each iteration.
@@ -80,8 +81,8 @@ class MyStack
     @store.size
   end
 
-  def pop(num)
-    @store.pop(num)
+  def pop
+    @store.pop
   end
 
   def push(num)
@@ -181,7 +182,7 @@ end
 class MinMaxStackQueue
   def initialize
     @in_stack = MinMaxStack.new
-    @out_stack = MinMaxStack.new_arr
+    @out_stack = MinMaxStack.new
   end
 
   def size
@@ -216,8 +217,34 @@ class MinMaxStackQueue
     mins.min
   end
 
+  def queueify
+    # How do you turn a stack into a queue? Flip it upside down.
+    @out_stack.push(@in_stack.pop) until @in_stack.empty?
+  end
+
+end
+
+# O(n) Optimized solution
+def max_windowed_range(array, window_size)
+  queue = MinMaxStackQueue.new
+  best_range = nil
+
+  array.each_with_index do |el, i|
+    queue.enqueue(el)
+    queue.dequeue if queue.size > window_size
+
+    if queue.size == window_size
+      current_range = queue.max - queue.min
+      best_range = current_range if !best_range || current_range > best_range
+    end
+  end
+
+ p best_range
 end
 
 
-
+p max_windowed_range([1, 0, 2, 5, 4, 8], 2) == 4 # 4, 8
+p max_windowed_range([1, 0, 2, 5, 4, 8], 3) == 5 # 0, 2, 5
+p max_windowed_range([1, 0, 2, 5, 4, 8], 4) == 6 # 2, 5, 4, 8
+p max_windowed_range([1, 3, 2, 5, 4, 8], 5) == 6 # 3, 2, 5, 4, 8
 
