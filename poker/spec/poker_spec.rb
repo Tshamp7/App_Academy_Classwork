@@ -203,4 +203,55 @@ describe 'Game' do
     end
   end
 
+  describe '#find_best_hand' do
+    it 'should find the best hand out of all the players hands.' do
+      game.deck.build_deck
+      game.deck.shuffle
+      game.deal
+      expect(game.find_best_hand).to be_a(Player)
+      game.find_best_hand
+    end
+  end
+
+  describe '#fold' do
+    it 'should remove the player who folded from the players array.' do
+      game.fold
+      expect(game.players.length).not_to eq(4)
+    end
+  end
+
+  describe '#assign_winnings' do
+    it 'should increase the winning players individual pot by the table pot amouunt.' do
+      game.deck.build_deck
+      game.deck.shuffle
+      game.deal
+      game.pot = 2000
+      game.high_bet_placer = game.find_best_hand
+      game.assign_winnings
+      expect(game.find_best_hand.pot).to eq(2500)
+    end
+  end
+
+  describe '#empty_hands' do
+    it 'should empty all players hands' do
+      game.deck.build_deck
+      game.deck.shuffle
+      game.deal
+      game.empty_hands
+      expect(game.turn.hand.cards).to be_empty
+    end
+  end
+
+  describe '#buy_in' do
+    it 'should buy in all players and subtract the buy in amount from each players pot.' do
+      game.buy_in
+      expect(game.turn.pot).to eq(450)
+    end
+
+    it 'should add the amounts subtracted from each players pot to the tables pot.' do
+      game.buy_in
+      expect(game.pot).to eq(game.buy_in_amount * game.players.size)
+    end
+  end
+
 end
