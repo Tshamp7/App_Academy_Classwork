@@ -73,6 +73,7 @@ INSERT INTO
 VALUES
     (2, (SELECT id FROM users WHERE fname = 'Joe' AND lname = 'Shamp'), 'Excuse me ?! I will hiss at whoever I so please! Silly dog...' );
 
+
 CREATE TABLE question_likes (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,

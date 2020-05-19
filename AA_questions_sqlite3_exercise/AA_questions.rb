@@ -27,7 +27,16 @@ class User
       WHERE id = ?
     SQL
     return nil unless user.length.positive?
-    p user
+    User.new(user.first)
+  end
+
+  def self.find_by_name(fname, lname)
+    user = QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+      SELECT *
+      FROM users
+      WHERE fname = ? AND lname = ?
+    SQL
+    return nil unless user.length.positive?
     User.new(user.first)
   end
 
@@ -35,6 +44,21 @@ class User
     @id = hash['id']
     @fname = hash['fname']
     @lname = hash['lname']
+  end
+
+  def insert
+    raise "#{self} already in database" if self.id
+    QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+      INSERT INTO 
+        users (fname, lname)
+      VALUES
+        (?, ?)
+    SQL
+    self.id = QuestionsDatabase.instance.last_insert_row_id
+  end
+
+  def authored_replies # <<<<< Need to test this method.
+    Replies.find_by_user_id(id)
   end
 end
 
@@ -54,7 +78,34 @@ class Question
       WHERE id = ?
     SQL
     return nil unless question.length.positive?
+
     Question.new(question.first)
+  end
+
+  def self.find_by_author_name(fname, lname)
+    author = QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+      SELECT *
+      FROM questions
+      WHERE id = (
+          SELECT id
+          FROM users
+          WHERE fname = ? AND lname = ?
+      )
+    SQL
+    return nil unless author.length.positive?
+
+    author.map { |datum| Question.new(datum) }
+  end
+
+  def self.find_by_author_id(id)
+    question = QuestionsDatabase.instance.execute(<<-SQL, id)
+      SELECT * 
+      FROM questions
+      WHERE author_id = ?
+    SQL
+    return nil unless question.length.positive?
+
+    question.map { |datum| Question.new(datum) }
   end
 
   def initialize(hash)
@@ -109,8 +160,28 @@ class Replies
     SQL
     return nil unless reply.length.positive?
 
-    p reply
     Replies.new(reply.first)
+  end
+
+  def self.find_by_user_id(author_id)
+    replies = QuestionsDatabase.instance.execute(<<-SQL, author_id)
+      SELECT *
+      FROM replies
+      WHERE author_id = ?
+    SQL
+    return nil unless replies.length.positive?
+
+    replies.map { |datum| Replies.new(datum) }
+  end
+
+  def self.find_by_question_id(subject_question)
+    replies = QuestionsDatabase.instance.execute(<<-SQL, subject_question)
+      SELECT *
+      FROM replies
+      WHERE subject_question = ?
+    SQL
+    return nil unless replies.length.positive?
+    replies.map { |datum| Replies.new(datum) }
   end
 
   def initialize(hash)
