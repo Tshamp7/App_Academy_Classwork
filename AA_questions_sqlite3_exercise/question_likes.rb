@@ -15,19 +15,30 @@ class Question_likes
         
         likers.map { |datum| User.new(datum) }
     end
-  
-  
-  
-  
-    # LEFT OFF HERE 
-    def self.num_likes_for_question(liked_question_id)
-      likes_for_question = QuestionsDatabase.instance.execute(<<-SQL, liked_question_id: id)
-      SELECT COUNT(*)
-      FROM question_likes
-      WHERE question_likes.liked_question_id = :id
-      SQL
 
-      likes_for_question
+    def self.num_likes_for_question(liked_question_id)
+      likes_for_question = QuestionsDatabase.instance.execute(<<-SQL, liked_question_id: liked_question_id)
+      SELECT COUNT(*) AS num_likes
+      FROM question_likes
+      WHERE :liked_question_id = question_likes.liked_question_id
+      SQL
+      return nil unless likes_for_question.length.positive?
+
+      likes_for_question.first['num_likes']
+    end
+
+    def self.liked_questions_for_user_id(passed_in_id)
+      liked_questions = QuestionsDatabase.instance.execute(<<-SQL, passed_in_id)
+        SELECT * 
+        FROM questions
+        WHERE questions.id IN (
+          SELECT liked_question_id
+          FROM question_likes
+          WHERE question_likes.user_id = ?
+        )
+      SQL
+      return nil unless liked_questions.length.positive?
+      liked_questions.map { |datum| Question.new(datum) }
     end
 
     def self.all
