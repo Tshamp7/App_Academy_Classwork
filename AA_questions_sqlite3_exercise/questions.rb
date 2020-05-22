@@ -76,6 +76,14 @@ class Question
       Question_follows.followers_for_question(self.id)
     end
 
+    def likers
+      Question_likes.likers_for_question(id)
+    end
+
+    def num_likes
+      Question_likes.num_likes_for_question(id)
+    end
+
   end
 
 
