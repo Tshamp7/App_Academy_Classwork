@@ -66,9 +66,6 @@ class User
           WHERE id = ?
         SQL
       end
-
-
-
     end
 
 

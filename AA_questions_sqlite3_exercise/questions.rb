@@ -60,6 +60,16 @@ class Question
       @body = hash["body"]
       @author_id = hash["author_id"]
     end
+
+    def insert
+      raise "#{self} already in database" if self.id
+
+      QuestionsDatabase.instance.execute(<<-SQL, title, body, author_id)
+      INSERT INTO questions (title, body, author_id)
+      VALUES (?, ?, ?)
+      SQL
+      self.id = QuestionsDatabase.instance.last_insert_row_id
+    end
   
     def author
       author = QuestionsDatabase.instance.execute(<<-SQL, author_id)
@@ -86,6 +96,25 @@ class Question
 
     def num_likes
       Question_likes.num_likes_for_question(id)
+    end
+
+    def save
+      if self.id == nil
+        self.insert
+      else
+        update_self = QuestionsDatabase.instance.execute(<<-SQL, title, body, author_id, id)
+          UPDATE questions
+          SET title = ?, body = ?, author_id = ?
+          WHERE id = ?
+        SQL
+      end
+    end
+
+    def delete_question
+      question_to_delete = QuestionsDatabase.instance.execute(<<-SQL, id)
+      DELETE FROM questions
+      WHERE questions.id = ?
+      SQL
     end
 
   end
