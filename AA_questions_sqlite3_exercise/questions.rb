@@ -4,6 +4,10 @@
 class Question
     attr_accessor :id, :title, :body, :author_id
 
+    def self.most_liked(n)
+      Question_likes.most_liked_questions(n)
+    end
+
     def self.most_followed
       Question_follows.nth_most_followed_questions(1)
     end

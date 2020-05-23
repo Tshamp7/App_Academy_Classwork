@@ -2,6 +2,21 @@
 # returns objects constucted from the question_likes table when queries are submitted. 
 class Question_likes
     attr_accessor :id, :user_id, :liked_question_id
+
+    def self.most_liked_questions(n)
+      most_liked_question = QuestionsDatabase.instance.execute(<<-SQL, n)
+        SELECT *, COUNT(question_likes.liked_question_id) AS number_of_likes
+        FROM questions
+        JOIN question_likes
+          ON question_likes.liked_question_id = questions.id
+        GROUP BY question_likes.liked_question_id
+        ORDER BY number_of_likes DESC
+        LIMIT ?
+      SQL
+      return nil unless most_liked_question.length.positive?
+
+      most_liked_question.map { |datum| Question.new(datum) }
+    end
   
     def self.likers_for_question(liked_question_id)
         likers = QuestionsDatabase.instance.execute(<<-SQL, liked_question_id: liked_question_id )

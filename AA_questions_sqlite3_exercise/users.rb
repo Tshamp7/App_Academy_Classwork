@@ -44,7 +44,7 @@ class User
       self.id = QuestionsDatabase.instance.last_insert_row_id
     end
   
-    def authored_replies # <<<<< Need to test this method.
+    def authored_replies
       Replies.find_by_user_id(id)
     end
   
@@ -56,4 +56,20 @@ class User
       Question_likes.liked_questions_for_user_id(id)
     end
   
+    def save
+      if self.id == nil
+        self.insert
+      else
+        update_self = QuestionsDatabase.instance.execute(<<-SQL, fname, lname, id)
+          UPDATE users
+          SET fname = ?, lname = ?
+          WHERE id = ?
+        SQL
+      end
+
+
+
+    end
+
+
   end
