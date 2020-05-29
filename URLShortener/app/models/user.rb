@@ -25,7 +25,7 @@ class User < ApplicationRecord
         primary_key: :id
     )
 
-    has_many :visited_urls, through: :visits, source: :shortened_url
+    has_many :visited_urls, Proc.new { distinct }, through: :visits, source: :shortened_url
 
     def make_shortened_url(input)
         user_id = self.id
@@ -36,8 +36,6 @@ class User < ApplicationRecord
             short_url: short_url, 
             long_url: input
             )
-
     end
-
 end
 

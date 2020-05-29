@@ -35,9 +35,20 @@ class ShortenedUrl < ApplicationRecord
       primary_key: :id
   )
 
-  has_many :visitors, through: :visits, source: :user
-
+  has_many :visitors, Proc.new {distinct}, through: :visits, source: :visitor
   
+
+  def num_clicks
+    visitors.count
+  end
+
+  def num_recent_uniques
+    visits
+      .select('user_id')
+      .where('created_at > ?', 10.minutes.ago)
+      .distinct
+      .count
+  end
   
 
 end

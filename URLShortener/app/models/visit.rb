@@ -17,7 +17,7 @@ class Visit < ApplicationRecord
   end
 
   belongs_to(
-      :user,
+      :visitor,
       class_name: 'User',
       foreign_key: :user_id,
       primary_key: :id
