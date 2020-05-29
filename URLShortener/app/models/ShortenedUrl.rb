@@ -37,6 +37,12 @@ class ShortenedUrl < ApplicationRecord
 
   has_many :visitors, Proc.new {distinct}, through: :visits, source: :visitor
   
+  has_many(
+      :tags,
+      class_name: :TagTopic,
+      foreign_key: :shortened_url_id,
+      primary_key: :id
+  )
 
   def num_clicks
     visitors.count
