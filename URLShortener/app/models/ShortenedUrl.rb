@@ -39,10 +39,12 @@ class ShortenedUrl < ApplicationRecord
   
   has_many(
       :tags,
-      class_name: :TagTopic,
+      class_name: 'Tagging',
       foreign_key: :shortened_url_id,
       primary_key: :id
   )
+
+  has_many :tag_topics, through: :tags, source: :tag_topic
 
   def num_clicks
     visitors.count

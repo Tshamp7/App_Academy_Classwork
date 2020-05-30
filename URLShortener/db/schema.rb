@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_29_214225) do
+ActiveRecord::Schema.define(version: 2020_05_30_020923) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,12 +24,11 @@ ActiveRecord::Schema.define(version: 2020_05_29_214225) do
   end
 
   create_table "tag_topics", force: :cascade do |t|
-    t.string "tag_name"
-    t.integer "tag_id"
+    t.string "tag_name", null: false
   end
 
   create_table "taggings", force: :cascade do |t|
-    t.integer "tagtopic_id", null: false
+    t.integer "tag_topic_id", null: false
     t.integer "shortened_url_id", null: false
   end
 
