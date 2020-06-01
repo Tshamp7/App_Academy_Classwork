@@ -6,6 +6,7 @@
 #  email      :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  premium    :boolean          default(FALSE)
 #
 class User < ApplicationRecord
     validates :email, presence: true
@@ -36,6 +37,10 @@ class User < ApplicationRecord
             short_url: short_url, 
             long_url: input
             )
+    end
+
+    def make_premium
+        self.update(premium: true)
     end
 end
 

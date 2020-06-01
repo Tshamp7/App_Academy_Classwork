@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_020923) do
+ActiveRecord::Schema.define(version: 2020_05_31_204944) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,23 +19,30 @@ ActiveRecord::Schema.define(version: 2020_05_30_020923) do
     t.integer "user_id"
     t.string "long_url", null: false
     t.string "short_url"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["long_url"], name: "index_shortened_urls_on_long_url", unique: true
     t.index ["short_url"], name: "index_shortened_urls_on_short_url", unique: true
   end
 
   create_table "tag_topics", force: :cascade do |t|
     t.string "tag_name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "taggings", force: :cascade do |t|
     t.integer "tag_topic_id", null: false
     t.integer "shortened_url_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "premium", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
